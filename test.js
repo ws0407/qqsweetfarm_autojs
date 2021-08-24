@@ -116,11 +116,21 @@ while(flag){
     img.recycle();
 
     // close the notice
-
+    img = images.captureScreen();
+    point = findImageInRegion(img, all_imgs["everyday_task_close_btn.png"],
+                            1620, 130, 200, 200, 0.8);
+    if(point){
+        clickImage("everyday_task_close_btn.png", point);
+    }
     // close the activity ads
 
     // close the upgrade warehouse
-
+    img = images.captureScreen();
+    point = findImageInRegion(img, all_imgs["warehouse_upgrading_ad_close_btn.png"], 
+                            1500, 270, 200, 200, 0.8);
+    if(point){
+        clickImage("warehouse_upgrading_ad_close_btn.png", point);
+    }
     // sign in when a new day come
 
     // center the lands by topping the delivery truck

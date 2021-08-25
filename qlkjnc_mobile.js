@@ -245,15 +245,17 @@ while(flag){
     // sow wheat
     if(status == 2){
         click(1170, 540);
-        sleep(2000);
+        sleep(1000);
         img = images.captureScreen();
-        var point_wheat_sow = findImage(img, all_imgs["sow_wheat_src.png"], {threshold: 0.8});
+        var point_wheat_sow = findImageInRegion(img, all_imgs["sow_wheat_src.png"], 
+                            wheat_sow_true_point.x - 100, wheat_sow_true_point.y - 100, 200, 200, 0.7);
         if(!point_wheat_sow){
-            toastLog("find wheat src failed!");
-            click(1170, 540);
-            sleep(1000);
+            // toastLog("find wheat src failed!");
+            // click(1180, 550);
+            sleep(2000);
             img = images.captureScreen();
-            var point_wheat_sow = findImage(img, all_imgs["sow_wheat_src.png"], {threshold: 0.8});
+            point_wheat_sow = findImageInRegion(img, all_imgs["sow_wheat_src.png"], 
+                            wheat_sow_true_point.x - 100, wheat_sow_true_point.y - 100, 200, 200, 0.7);
             if(!point_wheat_sow){
                 var point_sickle = findImage(img, all_imgs["sickle.png"], {threshold: 0.8});
                 if(point_sickle){

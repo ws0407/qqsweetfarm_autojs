@@ -77,3 +77,6 @@ IIII- Lessons
 
 - *Q: How can we do when a running app going crashed?*
 - **A: The screen won't change after several tests, so I set up a counter to record the time of crash, restart the app when the counter is greater than a specific value.**
+
+- *Q: The problem when the barn is full...*
+- **A: Failed to harvest, disturb the original order..., so I set up a status variable, before each state, check whether it is in this state. After completing the work in each state correctly, then jump to another state.**

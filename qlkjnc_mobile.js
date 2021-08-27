@@ -20,6 +20,7 @@ var delivery_truck_true_point = new Point(1152,552);
 var sickle_true_point = new Point(990,320);
 var home_rtn_btn_true_point = new Point(153, 53);
 var warehouse_wheat_true_point = new Point(698.0, 396.0);
+var warehouse_sell_btn_true_point = new Point(748, 890);
 
 if(!requestScreenCapture()){
     toastLog("request screen capture failed!");
@@ -61,10 +62,12 @@ img.recycle();
 
 // begin working
 var flag = true;
+var is_waiting = false;
 var times = 1;
 var status = 1;     // 1:harvest, 2:sow, 3:sell, 4:wrong
 var is_crashed = 0;
 while(flag){
+    log("start round "+ times +"...");
     // prevent application jamming
     launchApp(appName);
     sleep(1000);
@@ -101,12 +104,13 @@ while(flag){
                         );
             img.recycle();
             if(!point){
-                sleep(5000);
+                sleep(3000);
                 break;
             }
             // toast("waiting farm setup...");
             log("waiting farm setup...");
-            sleep(5000);
+            is_waiting = true;
+            sleep(3000);
         }
 
     }
@@ -136,6 +140,10 @@ while(flag){
     // sign in when a new day come
 
     // center the lands by topping the delivery truck
+    if(!is_waiting){
+        sleep(3000);
+    }
+    is_waiting = false;
     img = images.captureScreen();
     point = findImage(img, all_imgs["delivery_truck.png"], {threshold: 0.8});
     if(point){
@@ -170,7 +178,7 @@ while(flag){
     img.recycle();
     if((!ptopleft) || (!pdownright)){
         if(ptopleft){
-            log("ptopleft:"+ptopleft);
+            log("pdownright failed, ptopleft:"+ptopleft);
             if(Math.abs(ptopleft.x + topleft_offset.x - topleft_true_point.x) < 10){
                 ptopleft = topleft_true_point;
                 pdownright = downright_true_point;
@@ -180,7 +188,7 @@ while(flag){
                 continue;
             }
         }else if(pdownright){
-            log("pdownright:"+pdownright);
+            log("ptopleft failed, pdownright:"+pdownright);
             if(Math.abs(pdownright.x + downright_offset.x - downright_true_point.x) < 10){
                 ptopleft = topleft_true_point;
                 pdownright = downright_true_point;
@@ -208,6 +216,7 @@ while(flag){
 
     // harvest wheat
     if(status == 1){
+
         click(1170, 540);
         sleep(1000);
         img = images.captureScreen();
@@ -260,11 +269,12 @@ while(flag){
                 var point_sickle = findImage(img, all_imgs["sickle.png"], {threshold: 0.8});
                 if(point_sickle){
                     log("warehouse has benn full, begin to sell...");
-                    sellWheat();
+                    sellWheat(2);
                     status = 1;
                 }else{
                     toastLog("maybe sometiing goes to wrong...");
-                    sleep(10000);
+                    click(home_rtn_btn_true_point.x, home_rtn_btn_true_point.y);
+                    sleep(5000);
                 }
                 continue;
             }
@@ -275,10 +285,10 @@ while(flag){
     }
 
     if(status == 3){
-        var result = sellWheat();
+        var result = sellWheat(2);
         status = 1;
         if(result){
-            toastLog("第"+ times +"轮刷麦子已完成...");
+            toastLog("End of round "+ times +"!");
             times = times + 1;
             sleep(2000);
             click(home_rtn_btn_true_point.x, home_rtn_btn_true_point.y);
@@ -332,7 +342,7 @@ function getLandPath(_ptopleft, _pdownright){
             return null;
         }
     }
-    for(var i = 0; i <= r; i++){
+    for(var i = 0; i <= r+1; i++){
         if(i % 2 == 0){
             path[i*2] = [_ptopleft.x + i*landstep_offset.x, _ptopleft.y + i*landstep_offset.y];
             path[i*2+1] = [_ptopleft.x + (c+i)*landstep_offset.x, _ptopleft.y + (i-c)*landstep_offset.y];
@@ -348,37 +358,37 @@ function getLandPath(_ptopleft, _pdownright){
 function multiSwipe(_pstart, _land_path){
     switch(_land_path.length){
         case 6:
-            gesture(6000, _pstart,_land_path[0],_land_path[1],_land_path[2],
+            gesture(3000, _pstart,_land_path[0],_land_path[1],_land_path[2],
                     _land_path[3],_land_path[4],_land_path[5]);
             break;
         case 8:
-            gesture(8000, _pstart,_land_path[0],_land_path[1],_land_path[2],
+            gesture(4000, _pstart,_land_path[0],_land_path[1],_land_path[2],
                     _land_path[3],_land_path[4],_land_path[5],_land_path[6],_land_path[7]);
             break;
         case 10:
-            gesture(10000, _pstart,_land_path[0],_land_path[1],_land_path[2],
+            gesture(5000, _pstart,_land_path[0],_land_path[1],_land_path[2],
                     _land_path[3],_land_path[4],_land_path[5],_land_path[6],
                     _land_path[7],_land_path[8],_land_path[9]);
             break;
         case 12:
-            gesture(12000, _pstart,_land_path[0],_land_path[1],_land_path[2],_land_path[3],
+            gesture(6000, _pstart,_land_path[0],_land_path[1],_land_path[2],_land_path[3],
                     _land_path[4],_land_path[5],_land_path[6],_land_path[7],_land_path[8],
                     _land_path[9],_land_path[10],_land_path[11]);
             break;
         case 14:
-            gesture(12000, _pstart,_land_path[0],_land_path[1],_land_path[2],_land_path[3],
+            gesture(6000, _pstart,_land_path[0],_land_path[1],_land_path[2],_land_path[3],
                     _land_path[4],_land_path[5],_land_path[6],_land_path[7],_land_path[8],
                     _land_path[9],_land_path[10],_land_path[11],_land_path[12],_land_path[13]);
             break;
         default:
-            toast("mutiswipe failed!");
-            log("mutiswipe failed!");
+            toastLog("mutiswipe failed!");
             break;
     }
 }
 
 // open the warehouse and sell wheat
-function sellWheat(){
+function sellWheat(_num){
+    var num = Math.abs(Number(_num)) || 1;
     var _img = images.captureScreen();
     var _point = findImage(_img, all_imgs["warehouse.png"], 
                         {threshold: 0.8});
@@ -388,25 +398,31 @@ function sellWheat(){
         clickImage("warehouse.png", _point);
     }
     sleep(1000);
-    _img = images.captureScreen();
-    var warehouse_wheat = findImage(_img, all_imgs["warehouse_wheat.png"], 
-                        {threshold: 0.8});
-    
-    if(!warehouse_wheat || Math.abs(warehouse_wheat.x - warehouse_wheat_true_point.x) + Math.abs(warehouse_wheat.y - warehouse_wheat_true_point.y) > 20){
-        click(1680, 185);       // close btn
+    for(var i = 0; i < num; i++){
+        _img = images.captureScreen();
+        var warehouse_wheat = findImage(_img, all_imgs["warehouse_wheat.png"], 
+                            {threshold: 0.8});
+        
+        if(!warehouse_wheat || Math.abs(warehouse_wheat.y - warehouse_wheat_true_point.y) > 20){
+            click(1680, 185);       // close btn
+            sleep(500);
+            if(i == 0){
+                return false;
+            }
+            sleep(1500);
+            return true;
+        }
+        click(warehouse_wheat.x, 470);        // position of wheat in warehouse
         sleep(500);
-        return false;
+        // for(var i = 0; i < 30; i++){
+        //     click(905, 755);    // add the num of wheat to sell
+        //     sleep(100);
+        // }
+        click(warehouse_wheat.x, warehouse_sell_btn_true_point.y);        // sell btn in warehouse
+        sleep(500);
+        click(1170, 640);       // OK btn
+        sleep(500);
     }
-    click(750, 470);        // position of wheat in warehouse
-    sleep(500);
-    for(var i = 0; i < 30; i++){
-        click(905, 755);    // add the num of wheat to sell
-        sleep(100);
-    }
-    click(740, 890);        // sell btn in warehouse
-    sleep(500);
-    click(1170, 640);       // OK btn
-    sleep(500);
     click(1680, 185);       // close btn
     sleep(500);
     return true;

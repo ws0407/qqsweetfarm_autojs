@@ -67,233 +67,243 @@ var times = 1;
 var status = 1;     // 1:harvest, 2:sow, 3:sell, 4:wrong
 var is_crashed = 0;
 while(flag){
-    log("start round "+ times +"...");
-    // prevent application jamming
-    launchApp(appName);
-    sleep(1000);
-    var img = images.captureScreen();
-    if(img.getWidth() < img.getHeight()){
-        var wmdxsj;
-        while(true){
-            wmdxsj = text("我们的小世界").findOnce();
-            if(wmdxsj){
-                wmdxsj.click();
-                sleep(1000);
-                break;
-            }
-            sleep(1000);
-        }
-    
-        var wmdnc;
-        while(true){
-            wmdnc = text("我们的农场").findOnce();
-            if(wmdnc){
-                clickObject(wmdnc);
-                sleep(1000);
-                break;
-            }
-            sleep(1000);
-        }
+    try {
+        log("start round "+ times +"...");
+        // prevent application jamming
+        launchApp(appName);
         sleep(1000);
-    
-        while(true){
-            var img = images.captureScreen();
-            var point = findImageInRegion(img, 
-                            all_imgs["home_loading_rtn_btn.png"],
-                            0,0,200,200,0.8
-                        );
-            img.recycle();
-            if(!point){
-                sleep(3000);
-                break;
+        var img = images.captureScreen();
+        if(img.getWidth() < img.getHeight()){
+            var wmdxsj;
+            while(true){
+                wmdxsj = text("我们的小世界").findOnce();
+                if(wmdxsj){
+                    wmdxsj.click();
+                    sleep(1000);
+                    break;
+                }
+                sleep(1000);
             }
-            // toast("waiting farm setup...");
-            log("waiting farm setup...");
-            is_waiting = true;
+        
+            var wmdnc;
+            while(true){
+                wmdnc = text("我们的农场").findOnce();
+                if(wmdnc){
+                    clickObject(wmdnc);
+                    sleep(1000);
+                    break;
+                }
+                sleep(1000);
+            }
+            sleep(1000);
+        
+            while(true){
+                var img = images.captureScreen();
+                var point = findImageInRegion(img, 
+                                all_imgs["home_loading_rtn_btn.png"],
+                                0,0,200,200,0.8
+                            );
+                img.recycle();
+                if(!point){
+                    sleep(3000);
+                    break;
+                }
+                // toast("waiting farm setup...");
+                log("waiting farm setup...");
+                is_waiting = true;
+                sleep(3000);
+            }
+
+        }
+        img.recycle();
+
+        // close the notice
+        img = images.captureScreen();
+        point = findImageInRegion(img, all_imgs["everyday_task_close_btn.png"],
+                                1620, 130, 200, 200, 0.8);
+        if(point){
+            clickImage("everyday_task_close_btn.png", point);
+            log("close the everyday task.")
+            sleep(1000);
+        }
+        // close the activity ads
+
+        // close the upgrade warehouse
+        img = images.captureScreen();
+        point = findImageInRegion(img, all_imgs["warehouse_upgrading_ad_close_btn.png"], 
+                                1500, 270, 200, 200, 0.8);
+        if(point){
+            clickImage("warehouse_upgrading_ad_close_btn.png", point);
+            log("close the warehouse upgrading ad.")
+            sleep(1000);
+        }
+
+        // sign in when a new day come
+
+        // center the lands by topping the delivery truck
+        if(!is_waiting){
             sleep(3000);
         }
-
-    }
-    img.recycle();
-
-    // close the notice
-    img = images.captureScreen();
-    point = findImageInRegion(img, all_imgs["everyday_task_close_btn.png"],
-                            1620, 130, 200, 200, 0.8);
-    if(point){
-        clickImage("everyday_task_close_btn.png", point);
-        log("close the everyday task.")
-        sleep(1000);
-    }
-    // close the activity ads
-
-    // close the upgrade warehouse
-    img = images.captureScreen();
-    point = findImageInRegion(img, all_imgs["warehouse_upgrading_ad_close_btn.png"], 
-                            1500, 270, 200, 200, 0.8);
-    if(point){
-        clickImage("warehouse_upgrading_ad_close_btn.png", point);
-        log("close the warehouse upgrading ad.")
-        sleep(1000);
-    }
-
-    // sign in when a new day come
-
-    // center the lands by topping the delivery truck
-    if(!is_waiting){
-        sleep(3000);
-    }
-    is_waiting = false;
-    img = images.captureScreen();
-    point = findImage(img, all_imgs["delivery_truck.png"], {threshold: 0.8});
-    if(point){
-        is_crashed = 0;
-        swipe(point.x, point.y+100, 1000, 0, 2000);
-        sleep(1000);
-    }else{
-        log("truck not found!");
-        is_crashed = is_crashed + 1;
-        // var point_openspace = findImage(img, all_imgs["open_space.png"], {threshold: 0.8});
-        // if(point_openspace){
-        //     swipe(point_openspace.x + 100, point_openspace.y + 100, point_openspace.x, point_openspace.y+100, 1000);
-        // }
-        // img.recycle();
-        if(is_crashed >= 3){
+        is_waiting = false;
+        img = images.captureScreen();
+        point = findImage(img, all_imgs["delivery_truck.png"], {threshold: 0.8});
+        if(point){
             is_crashed = 0;
-            restartApp(appName);
+            swipe(point.x, point.y+100, 1000, 0, 2000);
+            sleep(1000);
+        }else{
+            log("truck not found!");
+            is_crashed = is_crashed + 1;
+            // var point_openspace = findImage(img, all_imgs["open_space.png"], {threshold: 0.8});
+            // if(point_openspace){
+            //     swipe(point_openspace.x + 100, point_openspace.y + 100, point_openspace.x, point_openspace.y+100, 1000);
+            // }
+            // img.recycle();
+            if(is_crashed >= 3){
+                is_crashed = 0;
+                restartApp(appName);
+                continue;
+            }
+            click(home_rtn_btn_true_point.x, home_rtn_btn_true_point.y);
+            sleep(5000);
             continue;
         }
-        click(home_rtn_btn_true_point.x, home_rtn_btn_true_point.y);
-        sleep(5000);
-        continue;
-    }
 
 
-    // locate to all lands
-    img = images.captureScreen();
-    var ptopleft = findImage(img, all_imgs["land_topleft.png"], 
-                        {threshold: 0.9});
-    var pdownright = findImage(img, all_imgs["land_downright.png"], 
-                        {threshold: 0.9});
-    img.recycle();
-    if((!ptopleft) || (!pdownright)){
-        if(ptopleft){
-            log("pdownright failed, ptopleft:"+ptopleft);
-            if(Math.abs(ptopleft.x + topleft_offset.x - topleft_true_point.x) < 10){
-                ptopleft = topleft_true_point;
-                pdownright = downright_true_point;
-            }else{
-                click(home_rtn_btn_true_point.x, home_rtn_btn_true_point.y);
-                sleep(20000);
-                continue;
-            }
-        }else if(pdownright){
-            log("ptopleft failed, pdownright:"+pdownright);
-            if(Math.abs(pdownright.x + downright_offset.x - downright_true_point.x) < 10){
-                ptopleft = topleft_true_point;
-                pdownright = downright_true_point;
-            }else{
-                click(home_rtn_btn_true_point.x, home_rtn_btn_true_point.y);
-                sleep(20000);
-                continue;
-            }
-        } else{
-            // toast("find point of topleft/downright land failed!");
-            log("find point of topleft/downright land failed!");
-            var ptopleft_empty = findImage(img, all_imgs["land_topleft_empty.png"], 
-                        {threshold: 0.9});
-            var pdownright_empty = findImage(img, all_imgs["land_downright_empty.png"], 
-                        {threshold: 0.9});
-            if(ptopleft_empty && pdownright_empty){
-                status = 2;
-            }else{
-                click(home_rtn_btn_true_point.x, home_rtn_btn_true_point.y);
-                sleep(20000);
-                continue;
+        // locate to all lands
+        img = images.captureScreen();
+        var ptopleft = findImage(img, all_imgs["land_topleft.png"], 
+                            {threshold: 0.9});
+        var pdownright = findImage(img, all_imgs["land_downright.png"], 
+                            {threshold: 0.9});
+        img.recycle();
+        if((!ptopleft) || (!pdownright)){
+            if(ptopleft){
+                log("pdownright failed, ptopleft:"+ptopleft);
+                if(Math.abs(ptopleft.x + topleft_offset.x - topleft_true_point.x) < 10){
+                    ptopleft = topleft_true_point;
+                    pdownright = downright_true_point;
+                }else{
+                    click(home_rtn_btn_true_point.x, home_rtn_btn_true_point.y);
+                    sleep(20000);
+                    continue;
+                }
+            }else if(pdownright){
+                log("ptopleft failed, pdownright:"+pdownright);
+                if(Math.abs(pdownright.x + downright_offset.x - downright_true_point.x) < 10){
+                    ptopleft = topleft_true_point;
+                    pdownright = downright_true_point;
+                }else{
+                    click(home_rtn_btn_true_point.x, home_rtn_btn_true_point.y);
+                    sleep(20000);
+                    continue;
+                }
+            } else{
+                // toast("find point of topleft/downright land failed!");
+                log("find point of topleft/downright land failed!");
+                var ptopleft_empty = findImage(img, all_imgs["land_topleft_empty.png"], 
+                            {threshold: 0.9});
+                var pdownright_empty = findImage(img, all_imgs["land_downright_empty.png"], 
+                            {threshold: 0.9});
+                if(ptopleft_empty && pdownright_empty){
+                    status = 2;
+                }else{
+                    click(home_rtn_btn_true_point.x, home_rtn_btn_true_point.y);
+                    sleep(20000);
+                    continue;
+                }
             }
         }
-    }
 
-    // harvest wheat
-    if(status == 1){
-
-        click(1170, 540);
-        sleep(1000);
-        img = images.captureScreen();
-        var point_sickle = findImage(img, all_imgs["sickle.png"], {threshold: 0.8});
-        if(!point_sickle){
-            var point_wheat_sow = findImage(img, all_imgs["sow_wheat_src.png"], {threshold: 0.8});
-            if(point_wheat_sow){
-                status = 2;
-            }else{
-                log("find sickle failed!");
-                click(home_rtn_btn_true_point.x, home_rtn_btn_true_point.y);
-                sleep(10000);
-                continue;
-            }
-        }else{
-            var land_path = getLandPath(ptopleft, pdownright);
+        // harvest wheat
+        var land_path;
+        if(status == 1){
+            click(1170, 540);
+            sleep(1000);
+            land_path = getLandPath(ptopleft, pdownright);
             if(land_path == null){
                 land_path = getLandPath(topleft_true_point, downright_true_point);
             }
-            multiSwipe([point_sickle.x, point_sickle.y], land_path);
-            status = 2;
-        }
-    }
-    
-    // click openspace to refresh
-    // var point_openspace = findImage(img, all_imgs["open_space.png"], {threshold: 0.8});
-    // if(point_openspace){
-    //     click(point_openspace.x, point_openspace.y);
-    //     log("click open space ok");
-    //     sleep(1000);
-    // }else{
-    //     log("click open space failed!");
-    // }
-
-    // sow wheat
-    if(status == 2){
-        click(1170, 540);
-        sleep(1000);
-        img = images.captureScreen();
-        var point_wheat_sow = findImageInRegion(img, all_imgs["sow_wheat_src.png"], 
-                            wheat_sow_true_point.x - 100, wheat_sow_true_point.y - 100, 200, 200, 0.7);
-        if(!point_wheat_sow){
-            // toastLog("find wheat src failed!");
-            // click(1180, 550);
-            sleep(2000);
             img = images.captureScreen();
-            point_wheat_sow = findImageInRegion(img, all_imgs["sow_wheat_src.png"], 
-                            wheat_sow_true_point.x - 100, wheat_sow_true_point.y - 100, 200, 200, 0.7);
-            if(!point_wheat_sow){
-                var point_sickle = findImage(img, all_imgs["sickle.png"], {threshold: 0.8});
-                if(point_sickle){
-                    log("warehouse has benn full, begin to sell...");
-                    sellWheat(2);
-                    status = 1;
+            var point_sickle = findImage(img, all_imgs["sickle.png"], {threshold: 0.8});
+            if(!point_sickle){
+                var point_wheat_sow = findImage(img, all_imgs["sow_wheat_src.png"], {threshold: 0.8});
+                if(point_wheat_sow){
+                    status = 2;
                 }else{
-                    toastLog("maybe sometiing goes to wrong...");
+                    log("find sickle failed!");
                     click(home_rtn_btn_true_point.x, home_rtn_btn_true_point.y);
-                    sleep(5000);
+                    sleep(10000);
+                    continue;
                 }
-                continue;
+            }else{
+                multiSwipe([point_sickle.x, point_sickle.y], land_path);
+                status = 2;
             }
         }
-        img.recycle();
-        multiSwipe([point_wheat_sow.x + 70, point_wheat_sow.y + 60] ,land_path);
-        status = 3;
-    }
+        
+        // click openspace to refresh
+        // var point_openspace = findImage(img, all_imgs["open_space.png"], {threshold: 0.8});
+        // if(point_openspace){
+        //     click(point_openspace.x, point_openspace.y);
+        //     log("click open space ok");
+        //     sleep(1000);
+        // }else{
+        //     log("click open space failed!");
+        // }
 
-    if(status == 3){
-        var result = sellWheat(2);
-        status = 1;
-        if(result){
-            toastLog("End of round "+ times +"!");
-            times = times + 1;
+        // sow wheat
+        if(status == 2){
             sleep(2000);
-            click(home_rtn_btn_true_point.x, home_rtn_btn_true_point.y);
-            sleep(100000);
+            img = images.captureScreen();
+            var point_wheat_sow = findImageInRegion(img, all_imgs["sow_wheat_src.png"], 
+                                0, 0, 2300, 1000, 0.7);
+            if(!point_wheat_sow){
+                click(1170, 540);
+                // toastLog("find wheat src failed!");
+                // click(1180, 550);
+                sleep(1000);
+                img = images.captureScreen();
+                point_wheat_sow = findImageInRegion(img, all_imgs["sow_wheat_src.png"], 
+                                0, 0, 2300, 1000, 0.7);
+                if(!point_wheat_sow){
+                    var point_sickle = findImage(img, all_imgs["sickle.png"], {threshold: 0.8});
+                    if(point_sickle){
+                        log("warehouse has benn full, begin to sell...");
+                        sellWheat(2);
+                        status = 1;
+                    }else{
+                        toastLog("maybe sometiing goes to wrong...");
+                        click(home_rtn_btn_true_point.x, home_rtn_btn_true_point.y);
+                        sleep(5000);
+                    }
+                    continue;
+                }
+            }
+            img.recycle();
+            multiSwipe([point_wheat_sow.x + 70, point_wheat_sow.y + 60] ,land_path);
+            status = 3;
         }
+
+        if(status == 3){
+            var result = sellWheat(2);
+            status = 1;
+            if(result){
+                toastLog("End of round "+ times +"!");
+                times = times + 1;
+                sleep(2000);
+                click(home_rtn_btn_true_point.x, home_rtn_btn_true_point.y);
+                sleep(100000);
+            }
+        }
+        
+    } catch (error) {
+        if(error.name == "JavaException"){
+            exit();
+        }
+        toastLog(error);
+        sleep(2000);
+        restartApp(appName);
     }
 }
 
